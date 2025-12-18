@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Proceed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+    }
+
+    .box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    button {
+      background-color: #1f3fa3;
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      font-size: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #18338a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <button id="proceedBtn" type="button">Proceed</button>
+  </div>
+
+  <script>
+    (function () {
+      // Injected destination (can be changed later)
+      const destination = "https://youtube.com";
+
+      document.getElementById("proceedBtn").addEventListener("click", function () {
+        window.location.href = destination;
+      });
+    })();
+  </script>
+
+</body>
+</html>
