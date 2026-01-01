@@ -1,140 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dean’s List Verification | Rosemont Hills Montessori College</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHMC Support | Registrar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
 
-  <style>
-    body {
-        display: flex;
-        justify-content: center;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f6f8;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #333;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
 
-    .container {
-      max-width: 520px;
-      background: #ffffff;
-      margin: 60px 24px;
-      padding: 32px;
-      border-radius: 6px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
+        #chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 650px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 20px;
+            border: 1px solid var(--border-color);
+        }
 
-    h1 {
-      margin-top: 0;
-      font-size: 22px;
-      color: #1f3fa3; /* royal blue */
-    }
+        /* Professional Header */
+        header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    p {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
+        header img {
+            height: 45px;
+            width: 45px;
+            object-fit: contain;
+        }
 
-    label {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+        header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 20px;
-    }
+        header p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #10b981; /* Online green */
+            font-weight: 500;
+        }
 
-    button {
-      background-color: #1f3fa3;
-      color: #ffffff;
-      border: none;
-      padding: 12px 20px;
-      font-size: 14px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+        /* Chat Window Area */
+        #chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fdfdfd;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-    button:hover {
-      background-color: #18338a;
-    }
+        /* Message Bubbles */
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
 
-    .note {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #777;
-    }
+        .message .user {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: var(--text-muted);
+        }
 
-    .footer {
-      margin-top: 24px;
-      font-size: 12px;
-      color: #777;
-    }
-  </style>
+        .message.self {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 14px 14px 2px 14px;
+        }
+        .message.self .user { color: rgba(255,255,255,0.8); }
+
+        .message.other {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border-radius: 14px 14px 14px 2px;
+        }
+
+        .message.system {
+            align-self: center;
+            text-align: center;
+            background: #eff6ff;
+            color: var(--primary-color);
+            border: 1px solid #dbeafe;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            max-width: 90%;
+            margin: 10px 0;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.7;
+            display: block;
+            text-align: right;
+        }
+
+        /* Quick Option Bubble */
+        .quick-options {
+            padding: 10px 20px;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+        }
+
+        #option-bubble, #option-bubble-2 {
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #option-bubble:hover, #option-bubble-2:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Input Area */
+        #input-area {
+            display: flex;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 10px;
+        }
+
+        #message {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        #message:focus {
+            border-color: var(--primary-color);
+        }
+
+        #send {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #send:hover { background: var(--primary-dark); }
+
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Dean’s List Verification</h1>
+    <div id="chat-container">
+        <header>
+            <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/RHMC-removed-bg.webp" alt="Logo">
+            <div>
+                <h2>RHMC Support</h2>
+                <p>● Always Online</p>
+            </div>
+        </header>
 
-    <p>
-      To complete your Dean’s List confirmation for the
-      <strong>Bachelor of Elementary Education (BEEd)</strong> program,
-      please enter the one-time verification code sent to your
-      registered Google account or mobile number.
-    </p>
+        <div id="chat-box">
+            <div class="message system">
+                Welcome to Rosemont Hills Montessori. How can we help you today?
+            </div>
+        </div>
 
-    <form method="POST" action="log_id.php">
-        <label for="code">ID</label>
-        <input
-          type="text"
-          id="code"
-          name="code"
-          placeholder="Enter Verification Code"
-          required
-        />
-        <button type="submit">Verify Code</button>
-      </form>
+        <div class="quick-options">
+            <div id="option-bubble">Deans List Verification</div>
+            <div id="option-bubble-2">Grade Inquiry</div>
+           
+        </div>
 
-    <p class="note">
-      <strong>Security notice:</strong>  
-      Never share your verification code with anyone.
-      Rosemont Hills Montessori College will never ask for your code
-      via email, message, or phone call.
-    </p>
-
-    <div class="footer">
-      © 2025 Rosemont Hills Montessori College<br />
-      Official Academic Verification Portal
+        <div id="input-area">
+            <input type="text" id="message" placeholder="Write a message...">
+            <button id="send">Send</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById("verificationForm").addEventListener("submit", function(e) {
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
+        // Use your existing Firebase logic here
+        const firebaseConfig = {
+            apiKey: "AIzaSyDj9wn6UZge1I4f-huQLH5T3Kc-FyiehRo",
+            authDomain: "support-7eb47.firebaseapp.com",
+            databaseURL: "https://support-7eb47-default-rtdb.firebaseio.com",
+            projectId: "support-7eb47",
+            storageBucket: "support-7eb47.firebasestorage.app",
+            messagingSenderId: "127998438840",
+            appId: "1:127998438840:web:bb658baa2d7b2e9fba334d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message');
+        const sendBtn = document.getElementById('send');
+        const optionBubble1 = document.getElementById('option-bubble');
+        const optionBubble2 = document.getElementById('option-bubble-2');
 
-      const code = document.getElementById("code").value.trim();
+        let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
+        if(!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
 
-      if (!code) {
-        alert("Please enter your verification code.");
-        return;
-      }
+        optionBubble1.onclick = () => { messageInput.value = optionBubble1.textContent; sendMessage(); };
+        optionBubble2.onclick = () => { messageInput.value = optionBubble2.textContent; sendMessage(); };
+        sendBtn.onclick = sendMessage;
+        messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
 
-      // Example placeholder action
-      alert("Verification submitted. Please wait for confirmation.");
+        function sendMessage() {
+            const msg = messageInput.value.trim();
+            if (msg) {
+                db.ref('messages').push({
+                    user: currentUser,
+                    text: msg,
+                    timestamp: Date.now()
+                });
+                messageInput.value = '';
+            }
+        }
 
-      // In production:
-      // Send `code` securely to your backend via HTTPS (POST request)
-    });
-  </script>
-
+        db.ref('messages').on('child_added', snapshot => {
+            const data = snapshot.val();
+            const isSelf = data.user === currentUser;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isSelf ? 'self' : 'other'}`;
+            
+            const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            msgDiv.innerHTML = `
+                <span class="user">${isSelf ? 'You' : data.user}</span>
+                ${data.text}
+                <span class="timestamp">${time}</span>
+            `;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
 </body>
 </html>
