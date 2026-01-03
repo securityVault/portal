@@ -16,185 +16,26 @@
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-main);
-        }
-
-        #chat-container {
-            width: 100%;
-            max-width: 450px;
-            height: 650px;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            margin: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        /* Professional Header */
-        header {
-            background: white;
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        header img {
-            height: 45px;
-            width: 45px;
-            object-fit: contain;
-        }
-
-        header h2 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        header p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: #10b981; /* Online green */
-            font-weight: 500;
-        }
-
-        /* Chat Window Area */
-        #chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #fdfdfd;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Message Bubbles */
-        .message {
-            max-width: 85%;
-            padding: 10px 14px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            position: relative;
-        }
-
-        .message .user {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: block;
-            color: var(--text-muted);
-        }
-
-        .message.self {
-            align-self: flex-end;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 14px 14px 2px 14px;
-        }
-        .message.self .user { color: rgba(255,255,255,0.8); }
-
-        .message.other {
-            align-self: flex-start;
-            background: #f1f5f9;
-            color: var(--text-main);
-            border-radius: 14px 14px 14px 2px;
-        }
-
-        .message.system {
-            align-self: center;
-            text-align: center;
-            background: #eff6ff;
-            color: var(--primary-color);
-            border: 1px solid #dbeafe;
-            font-size: 0.85rem;
-            border-radius: 12px;
-            max-width: 90%;
-            margin: 10px 0;
-        }
-
-        .timestamp {
-            font-size: 0.7rem;
-            margin-top: 4px;
-            opacity: 0.7;
-            display: block;
-            text-align: right;
-        }
-
-        /* Quick Option Bubble */
-        .quick-options {
-            padding: 10px 20px;
-            background: #fff;
-            border-top: 1px solid var(--border-color);
-        }
-
-        #option-bubble, #option-bubble-2 {
-            display: inline-block;
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        #option-bubble:hover, #option-bubble-2:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        /* Input Area */
-        #input-area {
-            display: flex;
-            padding: 16px;
-            background: white;
-            border-top: 1px solid var(--border-color);
-            gap: 10px;
-        }
-
-        #message {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-
-        #message:focus {
-            border-color: var(--primary-color);
-        }
-
-        #send {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 24px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        #send:hover { background: var(--primary-dark); }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-main); }
+        #chat-container { width: 100%; max-width: 450px; height: 650px; background: #ffffff; border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; margin: 20px; border: 1px solid var(--border-color); }
+        header { background: white; padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        header img { height: 45px; width: 45px; object-fit: contain; }
+        header h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+        header p { margin: 0; font-size: 0.8rem; color: #10b981; font-weight: 500; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 85%; padding: 10px 14px; font-size: 0.95rem; line-height: 1.5; position: relative; }
+        .message .user { font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; display: block; color: var(--text-muted); }
+        .message.self { align-self: flex-end; background: var(--primary-color); color: white; border-radius: 14px 14px 2px 14px; }
+        .message.self .user { color: rgba(255, 255, 255, 0.8); }
+        .message.other { align-self: flex-start; background: #f1f5f9; color: var(--text-main); border-radius: 14px 14px 14px 2px; }
+        .message.system { align-self: center; text-align: center; background: #eff6ff; color: var(--primary-color); border: 1px solid #dbeafe; font-size: 0.85rem; border-radius: 12px; max-width: 90%; margin: 10px 0; }
+        .timestamp { font-size: 0.7rem; margin-top: 4px; opacity: 0.7; display: block; text-align: right; }
+        .quick-options { padding: 10px 20px; background: #fff; border-top: 1px solid var(--border-color); }
+        #option-bubble, #option-bubble-2 { display: inline-block; padding: 8px 16px; background: white; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-right: 5px; }
+        #option-bubble:hover, #option-bubble-2:hover { background: var(--primary-color); color: white; }
+        #input-area { display: flex; padding: 16px; background: white; border-top: 1px solid var(--border-color); gap: 10px; }
+        #message { flex: 1; padding: 12px 16px; border-radius: 24px; border: 1px solid var(--border-color); outline: none; font-size: 0.95rem; }
+        #send { background: var(--primary-color); color: white; border: none; padding: 0 20px; border-radius: 24px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -209,15 +50,14 @@
         </header>
 
         <div id="chat-box">
-            <div class="message system">
-                Welcome to Rosemont Hills Montessori. How can we help you today?
-            </div>
+            <div class="message system">Welcome to Rosemont Hills Montessori. How can we help?</div>
         </div>
 
+        <div id="typing-indicator" style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
+        
         <div class="quick-options">
             <div id="option-bubble">Deans List Verification</div>
             <div id="option-bubble-2">Grade Inquiry</div>
-           
         </div>
 
         <div id="input-area">
@@ -229,7 +69,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script>
-        // Use your existing Firebase logic here
         const firebaseConfig = {
             apiKey: "AIzaSyDj9wn6UZge1I4f-huQLH5T3Kc-FyiehRo",
             authDomain: "support-7eb47.firebaseapp.com",
@@ -245,45 +84,92 @@
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
         const sendBtn = document.getElementById('send');
-        const optionBubble1 = document.getElementById('option-bubble');
-        const optionBubble2 = document.getElementById('option-bubble-2');
+        const typingIndicator = document.getElementById('typing-indicator');
 
         let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
-        if(!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
+        if (!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
 
-        optionBubble1.onclick = () => { messageInput.value = optionBubble1.textContent; sendMessage(); };
-        optionBubble2.onclick = () => { messageInput.value = optionBubble2.textContent; sendMessage(); };
-        sendBtn.onclick = sendMessage;
-        messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+        // --- 1. ADMIN TYPING LISTENER ---
+        db.ref('typingStatus/admin').on('value', snapshot => {
+            typingIndicator.innerText = snapshot.val() === true ? "RHMC Registrar is typing..." : "";
+        });
 
+        // --- 2. AI RESPONSE BRAIN ---
+        function getAIResponse(userText) {
+            const input = userText.toLowerCase();
+            if (input.includes("dean") || input.includes("verification")) {
+                return 'To verify the Dean\'s List, please login: <a href="https://accounts.google.com" target="_blank" style="color: #2563eb; font-weight: 600;">Login here</a>';
+            }
+            if (input.includes("grade")) {
+                return "Grades are usually posted 1 week after finals. Check your portal.";
+            }
+            if (input.includes("hi") || input.includes("hello")) {
+                return "Hello! How can I help with your registrar concerns?";
+            }
+            return "I'm not sure I understand. Could you please clarify your request?";
+        }
+
+        // --- 3. SEND MESSAGE FUNCTION ---
         function sendMessage() {
             const msg = messageInput.value.trim();
             if (msg) {
                 db.ref('messages').push({
                     user: currentUser,
                     text: msg,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    isAdmin: false
                 });
+                
+                // Trigger AI
+                setTimeout(() => {
+                    const aiReply = getAIResponse(msg);
+                    db.ref('messages').push({
+                        user: "RHMC Bot",
+                        text: aiReply,
+                        timestamp: Date.now(),
+                        isAI: true
+                    });
+                }, 1000);
+
                 messageInput.value = '';
             }
         }
 
+        // --- 4. DISPLAY MESSAGES ---
         db.ref('messages').on('child_added', snapshot => {
             const data = snapshot.val();
             const isSelf = data.user === currentUser;
+            const isAI = data.isAI;
+            const isAdmin = data.isAdmin;
+
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${isSelf ? 'self' : 'other'}`;
             
+            // Special styling for AI or Admin
+            if (isAI) msgDiv.style.borderLeft = "4px solid var(--primary-color)";
+            if (isAdmin) {
+                msgDiv.style.backgroundColor = "#dcfce7";
+                msgDiv.style.borderLeft = "4px solid #10b981";
+            }
+
             const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+            const status = isSelf ? `<span style="display:block; font-size:10px; text-align:right;">Delivered</span>` : "";
+
             msgDiv.innerHTML = `
                 <span class="user">${isSelf ? 'You' : data.user}</span>
                 ${data.text}
                 <span class="timestamp">${time}</span>
+                ${status}
             `;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
+
+        // Event Listeners
+        sendBtn.onclick = sendMessage;
+        messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+        document.getElementById('option-bubble').onclick = () => { messageInput.value = "Deans List Verification"; sendMessage(); };
+        document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "Grade Inquiry"; sendMessage(); };
     </script>
 </body>
 </html>
