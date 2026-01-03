@@ -165,6 +165,25 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         });
 
+         // --- DELETE MESSAGE IN REAL-TIME ---
+        // This listens for when a message is deleted from the Firebase backend
+        db.ref('messages').on('child_removed', snapshot => {
+            const deletedId = snapshot.key;
+
+            // We find all message elements and find the one that matches the deleted ID
+            // Note: We need to tag our message divs with IDs first (see update below)
+            const elementToRemove = document.getElementById(deletedId);
+            if (elementToRemove) {
+                elementToRemove.style.opacity = '0';
+                setTimeout(() => {
+                    elementToRemove.remove();
+                }, 300); // Smooth fade out before removing
+            } else {
+                // If "Delete All" was pressed, just reload to be safe
+                location.reload();
+            }
+        });
+
         // Event Listeners
         sendBtn.onclick = sendMessage;
         messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
@@ -173,3 +192,4 @@
     </script>
 </body>
 </html>
+
