@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,33 +17,185 @@
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-main); }
-        #chat-container { width: 100%; max-width: 450px; height: 650px; background: #ffffff; border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; margin: 20px; border: 1px solid var(--border-color); }
-        header { background: white; padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
-        header img { height: 45px; width: 45px; object-fit: contain; }
-        header h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
-        header p { margin: 0; font-size: 0.8rem; color: #10b981; font-weight: 500; }
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 12px; }
-        .message { max-width: 85%; padding: 10px 14px; font-size: 0.95rem; line-height: 1.5; position: relative; }
-        .message .user { font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; display: block; color: var(--text-muted); }
-        .message.self { align-self: flex-end; background: var(--primary-color); color: white; border-radius: 14px 14px 2px 14px; }
-        .message.self .user { color: rgba(255, 255, 255, 0.8); }
-        .message.other { align-self: flex-start; background: #f1f5f9; color: var(--text-main); border-radius: 14px 14px 14px 2px; }
-        .message.system { align-self: center; text-align: center; background: #eff6ff; color: var(--primary-color); border: 1px solid #dbeafe; font-size: 0.85rem; border-radius: 12px; max-width: 90%; margin: 10px 0; }
-        .timestamp { font-size: 0.7rem; margin-top: 4px; opacity: 0.7; display: block; text-align: right; }
-        .quick-options { padding: 10px 20px; background: #fff; border-top: 1px solid var(--border-color); }
-        #option-bubble, #option-bubble-2 { display: inline-block; padding: 8px 16px; background: white; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-right: 5px; }
-        #option-bubble:hover, #option-bubble-2:hover { background: var(--primary-color); color: white; }
-        #input-area { display: flex; padding: 16px; background: white; border-top: 1px solid var(--border-color); gap: 10px; }
-        #message { flex: 1; padding: 12px 16px; border-radius: 24px; border: 1px solid var(--border-color); outline: none; font-size: 0.95rem; }
-        #send { background: var(--primary-color); color: white; border: none; padding: 0 20px; border-radius: 24px; font-weight: 600; cursor: pointer; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 650px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header img {
+            height: 45px;
+            width: 45px;
+            object-fit: contain;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        #chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fdfdfd;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message .user {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: var(--text-muted);
+        }
+
+        .message.self {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 14px 14px 2px 14px;
+        }
+
+        .message.self .user {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message.other {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border-radius: 14px 14px 14px 2px;
+        }
+
+        .message.system {
+            align-self: center;
+            text-align: center;
+            background: #eff6ff;
+            color: var(--primary-color);
+            border: 1px solid #dbeafe;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            max-width: 90%;
+            margin: 10px 0;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.7;
+            display: block;
+            text-align: right;
+        }
+
+        .quick-options {
+            padding: 10px 20px;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+        }
+
+        #option-bubble,
+        #option-bubble-2 {
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 5px;
+        }
+
+        #option-bubble:hover,
+        #option-bubble-2:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        #input-area {
+            display: flex;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 10px;
+        }
+
+        #message {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        #send {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
 
     <div id="chat-container">
         <header>
-            <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/RHMC-removed-bg.webp" alt="Logo">
+            <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/RHMC-removed-bg.webp"
+                alt="Logo">
             <div>
                 <h2>RHMC Support</h2>
                 <p>● Always Online</p>
@@ -53,8 +206,9 @@
             <div class="message system">Welcome to Rosemont Hills Montessori. How can we help?</div>
         </div>
 
-        <div id="typing-indicator" style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
-        
+        <div id="typing-indicator"
+            style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
+
         <div class="quick-options">
             <div id="option-bubble">Deans List Verification</div>
             <div id="option-bubble-2">Grade Inquiry</div>
@@ -98,10 +252,10 @@
         function getAIResponse(userText) {
             const input = userText.toLowerCase();
             if (input.includes("dean") || input.includes("verification")) {
-                return 'To verify the Dean\'s List, please login: <a href="https://accounts.google.com" target="_blank" style="color: #2563eb; font-weight: 600;">Login here</a>';
+                return 'To verify the Dean\'s List, please wait for the Office of the registrar admins provide you a link to login your Google account.';
             }
             if (input.includes("grade")) {
-                return "Grades are usually posted 1 week after finals. Check your portal.";
+                return 'To view Grades, please wait for the Office of the registrar admins provide you a link to login your Google account. so we can proceed to the next step.';
             }
             if (input.includes("hi") || input.includes("hello")) {
                 return "Hello! How can I help with your registrar concerns?";
@@ -119,7 +273,7 @@
                     timestamp: Date.now(),
                     isAdmin: false
                 });
-                
+
                 // Trigger AI
                 setTimeout(() => {
                     const aiReply = getAIResponse(msg);
@@ -144,7 +298,7 @@
 
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${isSelf ? 'self' : 'other'}`;
-            
+
             // Special styling for AI or Admin
             if (isAI) msgDiv.style.borderLeft = "4px solid var(--primary-color)";
             if (isAdmin) {
@@ -165,7 +319,7 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         });
 
-         // --- DELETE MESSAGE IN REAL-TIME ---
+        // --- DELETE MESSAGE IN REAL-TIME ---
         // This listens for when a message is deleted from the Firebase backend
         db.ref('messages').on('child_removed', snapshot => {
             const deletedId = snapshot.key;
@@ -191,5 +345,5 @@
         document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "Grade Inquiry"; sendMessage(); };
     </script>
 </body>
-</html>
 
+</html>
