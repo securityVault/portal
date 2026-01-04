@@ -249,7 +249,8 @@
         const db = firebase.database();
 
         // 2. Gemini AI Setup
-        const API_KEY = "AIzaSyC9K3yTMMoBB9TazpZfbAegGsOcEaQ-6YA";
+        //const API_KEY = "AIzaSyC9K3yTMMoBB9TazpZfbAegGsOcEaQ-6YA";
+        const API_KEY = import.meta.env.VITE_GEMINI_KEY;
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash", 
@@ -381,4 +382,5 @@
     </script>
 </body>
 </html>
+
 
