@@ -222,7 +222,19 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDj9wn6UZge1I4f-huQLH5T3Kc-FyiehRo",
             authDomain: "support-7eb47.firebaseapp.com",
@@ -232,41 +244,58 @@
             messagingSenderId: "127998438840",
             appId: "1:127998438840:web:bb658baa2d7b2e9fba334d"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // 2. Gemini AI Setup
+        const API_KEY = "AIzaSyCXrRJrAM5ChufrxaM5tM3qpKO3e5ogH2E";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash", 
+            systemInstruction: "You are the RHMC Registrar Assistant. Be professional and concise. If students ask about Dean's list or Grades, tell them an admin will provide a Google verification link shortly. but if admin has not replied back tell users to hang on and stay here and wait for the admin to reply"
+        });
 
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
         const sendBtn = document.getElementById('send');
         const typingIndicator = document.getElementById('typing-indicator');
 
+        let aiTimeout = null;
+        let isAdminActive = false;
         let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
         if (!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
 
-        // --- 1. ADMIN TYPING LISTENER ---
-        db.ref('typingStatus/admin').on('value', snapshot => {
-            typingIndicator.innerText = snapshot.val() === true ? "RHMC Registrar is typing..." : "";
-        });
+        // --- AI RESPONSE ENGINE ---
+        async function triggerAI(userText) {
+            // Stop AI if Admin is active (unless it's a system-triggered backup)
+            if (isAdminActive && !userText.includes("(System:")) return;
 
-        // --- 2. AI RESPONSE BRAIN ---
-        function getAIResponse(userText) {
-            const input = userText.toLowerCase();
-            if (input.includes("dean") || input.includes("verification")) {
-                return 'To verify the Dean\'s List, please wait for the Office of the registrar admins provide you a link to login your Google account.';
+            typingIndicator.innerText = "RHMC Bot is replying...";
+            try {
+                const result = await model.generateContent(userText);
+                const response = await result.response;
+                const aiReply = response.text();
+
+                db.ref('messages').push({
+                    user: "RHMC Bot",
+                    text: aiReply,
+                    timestamp: Date.now(),
+                    isAI: true
+                });
+            } catch (error) {
+                console.error("AI Error:", error);
             }
-            if (input.includes("grade")) {
-                return 'To view Grades, please wait for the Office of the registrar admins provide you a link to login your Google account. so we can proceed to the next step.';
-            }
-            if (input.includes("hi") || input.includes("hello")) {
-                return "Hello! How can I help with your registrar concerns?";
-            }
-            return "I'm not sure I understand. Could you please clarify your request?";
+            typingIndicator.innerText = "";
+            aiTimeout = null;
         }
 
-        // --- 3. SEND MESSAGE FUNCTION ---
+        // --- SEND MESSAGE ---
         function sendMessage() {
             const msg = messageInput.value.trim();
             if (msg) {
+                if (aiTimeout) clearTimeout(aiTimeout);
+
                 db.ref('messages').push({
                     user: currentUser,
                     text: msg,
@@ -274,76 +303,81 @@
                     isAdmin: false
                 });
 
-                // Trigger AI
-                setTimeout(() => {
-                    const aiReply = getAIResponse(msg);
-                    db.ref('messages').push({
-                        user: "RHMC Bot",
-                        text: aiReply,
-                        timestamp: Date.now(),
-                        isAI: true
-                    });
-                }, 1000);
-
+                // If Admin is NOT here, AI replies in 1.5 seconds
+                if (!isAdminActive) {
+                    setTimeout(() => triggerAI(msg), 1500);
+                } else {
+                    // If Admin IS here, wait 2 mins of silence before AI checks in
+                    resetAiBackupTimer(msg);
+                }
                 messageInput.value = '';
             }
         }
 
-        // --- 4. DISPLAY MESSAGES ---
+        function resetAiBackupTimer(lastUserMsg) {
+            if (aiTimeout) clearTimeout(aiTimeout);
+            aiTimeout = setTimeout(() => {
+                isAdminActive = false; 
+                triggerAI(`(System: The admin hasn't replied in a while) ${lastUserMsg}`);
+            }, 15000); 
+        }
+
+        // --- RECEIVE MESSAGES & SYNC UI ---
         db.ref('messages').on('child_added', snapshot => {
             const data = snapshot.val();
+            const id = snapshot.key;
             const isSelf = data.user === currentUser;
-            const isAI = data.isAI;
-            const isAdmin = data.isAdmin;
 
+            // Detect Human Admin Presence
+            if (data.isAdmin === true) {
+                isAdminActive = true;
+                if (aiTimeout) clearTimeout(aiTimeout);
+                console.log("Admin joined. AI silenced.");
+            }
+
+            // Create Message Bubble
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${isSelf ? 'self' : 'other'}`;
+            msgDiv.id = id;
 
-            // Special styling for AI or Admin
-            if (isAI) msgDiv.style.borderLeft = "4px solid var(--primary-color)";
-            if (isAdmin) {
+            if (data.isAI) msgDiv.style.borderLeft = "4px solid var(--primary-color)";
+            if (data.isAdmin) {
                 msgDiv.style.backgroundColor = "#dcfce7";
                 msgDiv.style.borderLeft = "4px solid #10b981";
             }
 
             const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const status = isSelf ? `<span style="display:block; font-size:10px; text-align:right;">Delivered</span>` : "";
-
             msgDiv.innerHTML = `
                 <span class="user">${isSelf ? 'You' : data.user}</span>
                 ${data.text}
                 <span class="timestamp">${time}</span>
-                ${status}
             `;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
 
-        // --- DELETE MESSAGE IN REAL-TIME ---
-        // This listens for when a message is deleted from the Firebase backend
+        // --- REAL-TIME DELETE SYNC ---
         db.ref('messages').on('child_removed', snapshot => {
             const deletedId = snapshot.key;
-
-            // We find all message elements and find the one that matches the deleted ID
-            // Note: We need to tag our message divs with IDs first (see update below)
-            const elementToRemove = document.getElementById(deletedId);
-            if (elementToRemove) {
-                elementToRemove.style.opacity = '0';
-                setTimeout(() => {
-                    elementToRemove.remove();
-                }, 300); // Smooth fade out before removing
+            const element = document.getElementById(deletedId);
+            if (element) {
+                element.style.opacity = "0";
+                setTimeout(() => element.remove(), 300);
             } else {
-                // If "Delete All" was pressed, just reload to be safe
                 location.reload();
             }
+        });
+
+        // --- ADMIN TYPING SYNC ---
+        db.ref('typingStatus/admin').on('value', snap => {
+            typingIndicator.innerText = snap.val() ? "RHMC Registrar is typing..." : "";
         });
 
         // Event Listeners
         sendBtn.onclick = sendMessage;
         messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-        document.getElementById('option-bubble').onclick = () => { messageInput.value = "Deans List Verification"; sendMessage(); };
-        document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "Grade Inquiry"; sendMessage(); };
+        document.getElementById('option-bubble').onclick = () => { messageInput.value = "How do I verify the Deans List?"; sendMessage(); };
+        document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "I have a grade inquiry."; sendMessage(); };
     </script>
 </body>
-
 </html>
