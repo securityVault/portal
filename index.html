@@ -253,7 +253,7 @@
         const API_KEY = import.meta.env.VITE_GEMINI_KEY;
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash", 
+            model: "gemini-2.5-flash-lite", 
             systemInstruction: "You are the RHMC Registrar Assistant. Be professional and concise. If students ask about Dean's list or Grades, tell them an admin will provide a Google verification link shortly. but if admin has not replied back tell users to hang on and stay here and wait for the admin to reply"
         });
 
@@ -382,6 +382,7 @@
     </script>
 </body>
 </html>
+
 
 
 
