@@ -76,6 +76,7 @@
             overflow-y: auto;
             background: #fdfdfd;
             display: flex;
+            
             flex-direction: column;
             gap: 12px;
         }
@@ -115,8 +116,8 @@
         }
 
         .message.system {
-            align-self: center;
-            text-align: center;
+            align-self: left;
+            text-align: left;
             background: #eff6ff;
             color: var(--primary-color);
             border: 1px solid #dbeafe;
@@ -187,10 +188,94 @@
             font-weight: 600;
             cursor: pointer;
         }
+
+        #user-name-input {
+
+            width: auto;
+        }
+
+        #name-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            /* Stays on top of everything */
+        }
+
+
+        .name-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .name-modal input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .name-modal button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Style for images inside the chat */
+        .chat-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+            display: block;
+        }
+
+        /* Style for the paperclip button */
+        #attach-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 10px;
+            color: var(--text-muted);
+        }
+
+        #attach-btn:hover {
+            color: var(--primary-color);
+        }
+        #message{
+            width: 100px;
+        }
     </style>
 </head>
 
 <body>
+    <audio id="chat-sound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"
+        preload="auto"></audio>
+    <div id="name-overlay">
+        <div class="name-modal">
+            <h3>Welcome to RHMC Support</h3>
+            <p>Please enter your name to start chatting.</p>
+            <input type="text" id="user-name-input" placeholder="Your Name...">
+            <button id="save-name-btn">Join Chat</button>
+        </div>
+    </div>
 
     <div id="chat-container">
         <header>
@@ -215,9 +300,13 @@
         </div>
 
         <div id="input-area">
+            <input type="file" id="image-input" accept="image/*" style="display: none;">
+            <button id="attach-btn" title="Attach Image">+</button>
             <input type="text" id="message" placeholder="Write a message...">
             <button id="send">Send</button>
         </div>
+
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -249,23 +338,88 @@
         const db = firebase.database();
 
         // 2. Gemini AI Setup
-        //const API_KEY = "AIzaSyC9K3yTMMoBB9TazpZfbAegGsOcEaQ-6YA";
+        //const API_KEY = "AIzaSyCXrRJrAM5ChufrxaM5tM3qpKO3e5ogH2E";
         const API_KEY = import.meta.env.VITE_GEMINI_KEY;
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash-lite", 
+            model: "gemini-1.5-flash-lite",
             systemInstruction: "You are the RHMC Registrar Assistant. Be professional and concise. If students ask about Dean's list or Grades, tell them an admin will provide a Google verification link shortly. but if admin has not replied back tell users to hang on and stay here and wait for the admin to reply"
         });
+
+        const notificationSound = document.getElementById('chat-sound');
+
+        const overlay = document.getElementById('name-overlay');
+        const nameInput = document.getElementById('user-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
 
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
         const sendBtn = document.getElementById('send');
         const typingIndicator = document.getElementById('typing-indicator');
 
+        let currentUser = localStorage.getItem("chatUser");
+
+        if (currentUser) {
+            overlay.style.display = 'none'; // Hide if already named
+        }
+
+        const imageInput = document.getElementById('image-input');
+        const attachBtn = document.getElementById('attach-btn');
+
+        // Trigger file picker when paperclip is clicked
+        attachBtn.onclick = () => imageInput.click();
+
+        imageInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Check file size (Firebase has limits, keep it under 1MB)
+            if (file.size > 1024 * 1024) {
+                alert("Image is too large. Please choose an image under 1MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const base64Image = event.target.result;
+
+                // Push to Firebase
+                db.ref('messages').push({
+                    user: currentUser,
+                    text: "", // Empty text for images
+                    image: base64Image, // The image data
+                    timestamp: Date.now(),
+                    isAdmin: false
+                });
+            };
+            reader.readAsDataURL(file);
+            imageInput.value = ""; // Reset input
+        };
+
+        saveNameBtn.onclick = () => {
+            const name = nameInput.value.trim();
+            if (name.length >= 2) {
+
+                // UNLOCK AUDIO: Browser requires a user gesture to allow sounds
+                notificationSound.play().then(() => {
+                    notificationSound.pause(); // Play and immediately pause to "prime" it
+                    notificationSound.currentTime = 0;
+                }).catch(e => console.log("Audio unlock failed:", e));
+
+                localStorage.setItem("chatUser", name);
+                currentUser = name;
+                overlay.style.display = 'none';
+                // Optional: Send a "Joined" message to Firebase
+                db.ref('messages').push({ user: "System", text: `${name} has joined the chat.`, timestamp: Date.now() });
+            } else {
+                alert("Please enter a valid name.");
+            }
+        };
+
         let aiTimeout = null;
         let isAdminActive = false;
-        let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
-        if (!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
+        // let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
+        // if (!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
 
         // --- AI RESPONSE ENGINE ---
         async function triggerAI(userText) {
@@ -318,9 +472,9 @@
         function resetAiBackupTimer(lastUserMsg) {
             if (aiTimeout) clearTimeout(aiTimeout);
             aiTimeout = setTimeout(() => {
-                isAdminActive = false; 
+                isAdminActive = false;
                 triggerAI(`(System: The admin hasn't replied in a while) ${lastUserMsg}`);
-            }, 15000); 
+            }, 15000);
         }
 
         // --- RECEIVE MESSAGES & SYNC UI ---
@@ -328,6 +482,11 @@
             const data = snapshot.val();
             const id = snapshot.key;
             const isSelf = data.user === currentUser;
+
+            // NEW: Play sound if the message is NOT from you
+            if (!isSelf) {
+                notificationSound.play().catch(e => console.error("Sound blocked:", e));
+            }
 
             // Detect Human Admin Presence
             if (data.isAdmin === true) {
@@ -348,11 +507,16 @@
             }
 
             const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            let messageContent = data.text;
+            if (data.image) {
+                messageContent = `<img src="${data.image}" class="chat-image" onclick="window.open('${data.image}')">`;
+            }
+
             msgDiv.innerHTML = `
-                <span class="user">${isSelf ? 'You' : data.user}</span>
-                ${data.text}
-                <span class="timestamp">${time}</span>
-            `;
+    <span class="user">${isSelf ? 'You' : data.user}</span>
+    ${messageContent}
+    <span class="timestamp">${time}</span>
+`;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
@@ -381,8 +545,5 @@
         document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "I have a grade inquiry."; sendMessage(); };
     </script>
 </body>
+
 </html>
-
-
-
-
