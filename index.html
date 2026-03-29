@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHMC Support | Registrar</title>
+    <title>Student Inquiry Support</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -30,7 +30,7 @@
 
         #chat-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 600px;
             height: 650px;
             background: #ffffff;
             border-radius: 16px;
@@ -76,7 +76,6 @@
             overflow-y: auto;
             background: #fdfdfd;
             display: flex;
-            
             flex-direction: column;
             gap: 12px;
         }
@@ -190,7 +189,6 @@
         }
 
         #user-name-input {
-
             width: auto;
         }
 
@@ -205,9 +203,7 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            /* Stays on top of everything */
         }
-
 
         .name-modal {
             background: white;
@@ -237,7 +233,6 @@
             font-weight: bold;
         }
 
-        /* Style for images inside the chat */
         .chat-image {
             max-width: 100%;
             border-radius: 8px;
@@ -246,7 +241,6 @@
             display: block;
         }
 
-        /* Style for the paperclip button */
         #attach-btn {
             background: none;
             border: none;
@@ -259,18 +253,15 @@
         #attach-btn:hover {
             color: var(--primary-color);
         }
-        #message{
-            width: 100px;
-        }
     </style>
 </head>
 
 <body>
-    <audio id="chat-sound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"
-        preload="auto"></audio>
+    <audio id="chat-sound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+    
     <div id="name-overlay">
         <div class="name-modal">
-            <h3>Welcome to RHMC Support</h3>
+            <h3>Universal Student Support Portal (USSP)</h3>
             <p>Please enter your name to start chatting.</p>
             <input type="text" id="user-name-input" placeholder="Your Name...">
             <button id="save-name-btn">Join Chat</button>
@@ -279,20 +270,18 @@
 
     <div id="chat-container">
         <header>
-            <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/RHMC-removed-bg.webp"
-                alt="Logo">
+            <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/ussp.png" alt="Logo">
             <div>
-                <h2>RHMC Support</h2>
+                <h2>Universal Student Support Portal (USSP)</h2>
                 <p>● Always Online</p>
             </div>
         </header>
 
         <div id="chat-box">
-            <div class="message system">Welcome to Rosemont Hills Montessori. How can we help?</div>
+            <div class="message system">A new centralized digital platform designed to provide comprehensive support services, academic resources, and administrative tools to students</div>
         </div>
 
-        <div id="typing-indicator"
-            style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
+        <div id="typing-indicator" style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
 
         <div class="quick-options">
             <div id="option-bubble">Deans List Verification</div>
@@ -305,24 +294,12 @@
             <input type="text" id="message" placeholder="Write a message...">
             <button id="send">Send</button>
         </div>
-
-
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-
     <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
-
         // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDj9wn6UZge1I4f-huQLH5T3Kc-FyiehRo",
@@ -337,16 +314,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 2. Gemini AI Setup
+        // 2. Groq API Setup
+        
         const API_KEY = import.meta.env.VITE_GEMINI_KEY; 
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash-lite",
-            systemInstruction: "You are the RHMC Registrar Assistant. Be professional and concise. If students ask about Dean's list or Grades, tell them an admin will provide a Google verification link shortly. but if admin has not replied back tell users to hang on and stay here and wait for the admin to reply"
-        });
+        //const GROQ_API_KEY = "";
+        const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
         const notificationSound = document.getElementById('chat-sound');
-
         const overlay = document.getElementById('name-overlay');
         const nameInput = document.getElementById('user-name-input');
         const saveNameBtn = document.getElementById('save-name-btn');
@@ -358,21 +332,27 @@
 
         let currentUser = localStorage.getItem("chatUser");
 
+        // --- NEW: Dynamic Typing Listener ---
+        function setupTypingListener() {
+            db.ref(`typingStatus/${currentUser}`).on('value', snap => {
+                typingIndicator.innerText = snap.val() ? "USSP Admin is typing..." : "";
+            });
+        }
+
         if (currentUser) {
-            overlay.style.display = 'none'; // Hide if already named
+            overlay.style.display = 'none'; 
+            setupTypingListener();
         }
 
         const imageInput = document.getElementById('image-input');
         const attachBtn = document.getElementById('attach-btn');
 
-        // Trigger file picker when paperclip is clicked
         attachBtn.onclick = () => imageInput.click();
 
         imageInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Check file size (Firebase has limits, keep it under 1MB)
             if (file.size > 1024 * 1024) {
                 alert("Image is too large. Please choose an image under 1MB.");
                 return;
@@ -381,35 +361,32 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 const base64Image = event.target.result;
-
-                // Push to Firebase
                 db.ref('messages').push({
                     user: currentUser,
-                    text: "", // Empty text for images
-                    image: base64Image, // The image data
+                    text: "", 
+                    image: base64Image, 
                     timestamp: Date.now(),
                     isAdmin: false
                 });
             };
             reader.readAsDataURL(file);
-            imageInput.value = ""; // Reset input
+            imageInput.value = ""; 
         };
 
         saveNameBtn.onclick = () => {
             const name = nameInput.value.trim();
             if (name.length >= 2) {
-
-                // UNLOCK AUDIO: Browser requires a user gesture to allow sounds
                 notificationSound.play().then(() => {
-                    notificationSound.pause(); // Play and immediately pause to "prime" it
+                    notificationSound.pause(); 
                     notificationSound.currentTime = 0;
                 }).catch(e => console.log("Audio unlock failed:", e));
 
                 localStorage.setItem("chatUser", name);
                 currentUser = name;
                 overlay.style.display = 'none';
-                // Optional: Send a "Joined" message to Firebase
-                db.ref('messages').push({ user: "System", text: `${name} has joined the chat.`, timestamp: Date.now() });
+               // db.ref('messages').push({ user: "System", text: `${name} has joined the chat.`, timestamp: Date.now() });
+                
+                setupTypingListener(); // Initialize listener after logging in
             } else {
                 alert("Please enter a valid name.");
             }
@@ -417,32 +394,71 @@
 
         let aiTimeout = null;
         let isAdminActive = false;
-        // let currentUser = localStorage.getItem("chatUser") || "User" + Math.floor(Math.random() * 1000);
-        // if (!localStorage.getItem("chatUser")) localStorage.setItem("chatUser", currentUser);
 
-        // --- AI RESPONSE ENGINE ---
-        async function triggerAI(userText) {
-            // Stop AI if Admin is active (unless it's a system-triggered backup)
-            if (isAdminActive && !userText.includes("(System:")) return;
+   // --- GROQ AI RESPONSE ENGINE ---
+async function triggerAI(userText) {
+    if (isAdminActive && !userText.includes("(System:")) return;
 
-            typingIndicator.innerText = "RHMC Bot is replying...";
-            try {
-                const result = await model.generateContent(userText);
-                const response = await result.response;
-                const aiReply = response.text();
+    typingIndicator.innerText = "Klaviyo AI is replying...";
+    
+    try {
+        const response = await fetch(GROQ_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant", 
+                messages: [
+                    {
+                       role: "system",
+                        content: "You are the Universal Student Support Portal (USSP) Assistant serving all educational institutions in Cebu. Provide clear, concise, and professional responses (1–2 sentences). Maintain a formal, authoritative, and reassuring tone similar to an official government service. Only provide general, non-sensitive information such as admissions, enrollment, schedules, and requirements. Do not provide or guess any personal or academic records, including grades or Dean’s List status. For grade inquiries or academic verification, first request the following required details: full name, course/program, year level, and school ID number. After collecting the required information, inform the student that their request has been received and is being processed by the appropriate office. If the request is still pending, instruct the student to remain connected while processing continues. Do not ask unnecessary questions or offer options. Ensure responses sound official, controlled, and trustworthy at all times."
+                    },
+                    {
+                        role: "user",
+                        content: userText
+                    }
+                ]
+            })
+        });
 
-                db.ref('messages').push({
-                    user: "RHMC Bot",
-                    text: aiReply,
-                    timestamp: Date.now(),
-                    isAI: true
-                });
-            } catch (error) {
-                console.error("AI Error:", error);
-            }
-            typingIndicator.innerText = "";
-            aiTimeout = null;
+        const data = await response.json();
+
+        // NEW: Check if Groq sent an error (like an invalid API key)
+        if (!response.ok) {
+            console.error("GROQ API REJECTED THE REQUEST:", data);
+            throw new Error(data.error?.message || "Unknown Groq Error");
         }
+
+        // If successful, extract the message
+        const aiReply = data.choices[0].message.content;
+
+        db.ref('messages').push({
+            user: "Klaviyo AI",
+            to: currentUser,
+            text: aiReply,
+            timestamp: Date.now(),
+            isAI: true
+        });
+
+    } catch (error) {
+        // This stops the crash and tells you exactly what went wrong in the console!
+        console.error("AI Trigger Failed:", error.message);
+        
+        // Optional: Let the user know the bot is down so they aren't waiting forever
+        db.ref('messages').push({
+            user: "Klaviyo AI",
+            to: currentUser,
+            text: "I am currently offline or experiencing high traffic. Please wait for a human admin to reply.",
+            timestamp: Date.now(),
+            isAI: true
+        });
+    } finally {
+        typingIndicator.innerText = "";
+        aiTimeout = null;
+    }
+}
 
         // --- SEND MESSAGE ---
         function sendMessage() {
@@ -457,11 +473,9 @@
                     isAdmin: false
                 });
 
-                // If Admin is NOT here, AI replies in 1.5 seconds
                 if (!isAdminActive) {
                     setTimeout(() => triggerAI(msg), 1500);
                 } else {
-                    // If Admin IS here, wait 2 mins of silence before AI checks in
                     resetAiBackupTimer(msg);
                 }
                 messageInput.value = '';
@@ -482,22 +496,23 @@
             const id = snapshot.key;
             const isSelf = data.user === currentUser;
 
-            // NEW: Play sound if the message is NOT from you
+            // Security checks
+            if (data.to && data.to !== currentUser) return; 
+            if (!isSelf && data.user !== "USSP Admin - Abby" && data.user !== "Klaviyo AI" && data.user !== "System") return;
+
             if (!isSelf) {
                 notificationSound.play().catch(e => console.error("Sound blocked:", e));
             }
 
-            // Detect Human Admin Presence
             if (data.isAdmin === true) {
                 isAdminActive = true;
                 if (aiTimeout) clearTimeout(aiTimeout);
                 console.log("Admin joined. AI silenced.");
             }
 
-            // Create Message Bubble
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${isSelf ? 'self' : 'other'}`;
-            msgDiv.id = id;
+            msgDiv.id = `msg-${id}`;
 
             if (data.isAI) msgDiv.style.borderLeft = "4px solid var(--primary-color)";
             if (data.isAdmin) {
@@ -512,29 +527,21 @@
             }
 
             msgDiv.innerHTML = `
-    <span class="user">${isSelf ? 'You' : data.user}</span>
-    ${messageContent}
-    <span class="timestamp">${time}</span>
-`;
+                <span class="user">${isSelf ? 'You' : data.user}</span>
+                ${messageContent}
+                <span class="timestamp">${time}</span>
+            `;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
 
         // --- REAL-TIME DELETE SYNC ---
         db.ref('messages').on('child_removed', snapshot => {
-            const deletedId = snapshot.key;
-            const element = document.getElementById(deletedId);
+            const element = document.getElementById(`msg-${snapshot.key}`);
             if (element) {
                 element.style.opacity = "0";
                 setTimeout(() => element.remove(), 300);
-            } else {
-                location.reload();
             }
-        });
-
-        // --- ADMIN TYPING SYNC ---
-        db.ref('typingStatus/admin').on('value', snap => {
-            typingIndicator.innerText = snap.val() ? "RHMC Registrar is typing..." : "";
         });
 
         // Event Listeners
@@ -546,6 +553,3 @@
 </body>
 
 </html>
-
-
-
