@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Student Inquiry Support</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -24,50 +24,57 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             color: var(--text-main);
+            /* Prevent bounce scrolling on mobile iOS */
+            overscroll-behavior-y: none;
         }
 
         #chat-container {
             width: 100%;
             max-width: 600px;
-            height: 650px;
+            height: 85vh;
+            max-height: 800px;
             background: #ffffff;
             border-radius: 16px;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            margin: 20px;
             border: 1px solid var(--border-color);
         }
 
         header {
             background: white;
-            padding: 20px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 12px;
+            z-index: 10;
         }
 
         header img {
-            height: 45px;
-            width: 45px;
+            height: 40px;
+            width: 40px;
             object-fit: contain;
+            border-radius: 50%;
         }
 
         header h2 {
             margin: 0;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
         }
 
         header p {
-            margin: 0;
-            font-size: 0.8rem;
+            margin: 2px 0 0 0;
+            font-size: 0.75rem;
             color: #10b981;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         #chat-box {
@@ -78,14 +85,16 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            scroll-behavior: smooth;
         }
 
         .message {
             max-width: 85%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             font-size: 0.95rem;
             line-height: 1.5;
             position: relative;
+            word-wrap: break-word;
         }
 
         .message .user {
@@ -100,23 +109,23 @@
             align-self: flex-end;
             background: var(--primary-color);
             color: white;
-            border-radius: 14px 14px 2px 14px;
+            border-radius: 16px 16px 4px 16px;
         }
 
         .message.self .user {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .message.other {
             align-self: flex-start;
             background: #f1f5f9;
             color: var(--text-main);
-            border-radius: 14px 14px 14px 2px;
+            border-radius: 16px 16px 16px 4px;
         }
 
         .message.system {
-            align-self: left;
-            text-align: left;
+            align-self: center;
+            text-align: center;
             background: #eff6ff;
             color: var(--primary-color);
             border: 1px solid #dbeafe;
@@ -124,25 +133,52 @@
             border-radius: 12px;
             max-width: 90%;
             margin: 10px 0;
+            padding: 10px 14px;
         }
 
         .timestamp {
             font-size: 0.7rem;
-            margin-top: 4px;
+            margin-top: 6px;
             opacity: 0.7;
             display: block;
             text-align: right;
         }
 
-        .quick-options {
-            padding: 10px 20px;
-            background: #fff;
-            border-top: 1px solid var(--border-color);
+        /* Animated Typing Indicator */
+        .typing-wrapper {
+            padding: 0 20px 10px 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .typing-wrapper.active { opacity: 1; }
+        .typing-text { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 4px;}
+        .dot {
+            width: 6px; height: 6px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
         }
 
-        #option-bubble,
-        #option-bubble-2 {
-            display: inline-block;
+        .quick-options {
+            padding: 12px 20px;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-bubble {
             padding: 8px 16px;
             background: white;
             border: 1px solid var(--primary-color);
@@ -152,21 +188,21 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-right: 5px;
+            white-space: nowrap;
         }
 
-        #option-bubble:hover,
-        #option-bubble-2:hover {
+        .option-bubble:hover, .option-bubble:active {
             background: var(--primary-color);
             color: white;
         }
 
         #input-area {
             display: flex;
-            padding: 16px;
+            padding: 12px 16px;
             background: white;
             border-top: 1px solid var(--border-color);
-            gap: 10px;
+            gap: 8px;
+            align-items: center;
         }
 
         #message {
@@ -176,29 +212,56 @@
             border: 1px solid var(--border-color);
             outline: none;
             font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        #message:focus {
+            border-color: var(--primary-color);
         }
 
         #send {
             background: var(--primary-color);
             color: white;
             border: none;
+            height: 45px;
             padding: 0 20px;
             border-radius: 24px;
             font-weight: 600;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        #user-name-input {
-            width: auto;
+        #send:hover, #send:active {
+            background: var(--primary-dark);
         }
 
+        #attach-btn {
+            background: #f1f5f9;
+            border: none;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        #attach-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-color);
+        }
+
+        /* Modal styling */
         #name-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -207,51 +270,59 @@
 
         .name-modal {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
+            padding: 32px 24px;
+            border-radius: 16px;
             text-align: center;
             width: 90%;
             max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
+
+        .name-modal h3 { margin-top: 0; color: var(--text-main); }
+        .name-modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;}
 
         .name-modal input {
             width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
         }
+        .name-modal input:focus { border-color: var(--primary-color); }
 
         .name-modal button {
-            background: #007bff;
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 6px;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1rem;
         }
 
         .chat-image {
             max-width: 100%;
             border-radius: 8px;
-            margin-top: 5px;
+            margin-top: 8px;
             cursor: pointer;
             display: block;
         }
 
-        #attach-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0 10px;
-            color: var(--text-muted);
-        }
-
-        #attach-btn:hover {
-            color: var(--primary-color);
+        /* --- MOBILE SPECIFIC CSS --- */
+        @media (max-width: 600px) {
+            body { align-items: flex-start; }
+            #chat-container {
+                height: 100dvh; /* Uses dynamic viewport height for mobile browsers */
+                max-height: none;
+                border-radius: 0;
+                border: none;
+            }
+            .message { max-width: 90%; }
         }
     </style>
 </head>
@@ -261,9 +332,9 @@
     
     <div id="name-overlay">
         <div class="name-modal">
-            <h3>Universal Student Support Portal (USSP)</h3>
+            <h3>Student Support Portal</h3>
             <p>Please enter your name to start chatting.</p>
-            <input type="text" id="user-name-input" placeholder="Your Name...">
+            <input type="text" id="user-name-input" placeholder="Your full name...">
             <button id="save-name-btn">Join Chat</button>
         </div>
     </div>
@@ -272,25 +343,30 @@
         <header>
             <img src="https://wsxgspskhljmuifbzebm.supabase.co/storage/v1/object/public/background_images/ussp.png" alt="Logo">
             <div>
-                <h2>Universal Student Support Portal (USSP)</h2>
-                <p>● Always Online</p>
+                <h2>Universal Student Support (USSP)</h2>
+                <p>🟢 Always Online</p>
             </div>
         </header>
 
         <div id="chat-box">
-            <div class="message system">A new centralized digital platform designed to provide comprehensive support services, academic resources, and administrative tools to students</div>
+            <div class="message system">A new centralized digital platform designed to provide comprehensive support services, academic resources, and administrative tools to students.</div>
         </div>
 
-        <div id="typing-indicator" style="padding: 0 20px; font-size: 0.8rem; color: #64748b; font-style: italic; height: 20px;"></div>
+        <div id="typing-indicator" class="typing-wrapper">
+            <span class="typing-text" id="typing-text-label"></span>
+            <div class="dot" style="display:none;" id="dot1"></div>
+            <div class="dot" style="display:none;" id="dot2"></div>
+            <div class="dot" style="display:none;" id="dot3"></div>
+        </div>
 
         <div class="quick-options">
-            <div id="option-bubble">Deans List Verification</div>
-            <div id="option-bubble-2">Grade Inquiry</div>
+            <div class="option-bubble" onclick="sendQuickMessage('How do I verify the Deans List?')">Deans List Verification</div>
+            <div class="option-bubble" onclick="sendQuickMessage('I have a grade inquiry.')">Grade Inquiry</div>
         </div>
 
         <div id="input-area">
             <input type="file" id="image-input" accept="image/*" style="display: none;">
-            <button id="attach-btn" title="Attach Image">+</button>
+            <button id="attach-btn" title="Attach Image">📎</button>
             <input type="text" id="message" placeholder="Write a message...">
             <button id="send">Send</button>
         </div>
@@ -313,11 +389,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // 2. Groq API Setup
         
         const API_KEY = import.meta.env.VITE_GEMINI_KEY; 
-        //const GROQ_API_KEY = "";
         const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
         const notificationSound = document.getElementById('chat-sound');
@@ -328,14 +401,36 @@
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
         const sendBtn = document.getElementById('send');
-        const typingIndicator = document.getElementById('typing-indicator');
+        const typingWrapper = document.getElementById('typing-indicator');
+        const typingLabel = document.getElementById('typing-text-label');
+        const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
 
         let currentUser = localStorage.getItem("chatUser");
 
-        // --- NEW: Dynamic Typing Listener ---
+        // Helper to scroll to bottom
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // --- Dynamic Typing Listener ---
+        function setTypingStatus(isTyping, name = "") {
+            if (isTyping) {
+                typingLabel.innerText = `${name} is typing`;
+                dots.forEach(d => d.style.display = 'block');
+                typingWrapper.classList.add('active');
+                scrollToBottom();
+            } else {
+                typingWrapper.classList.remove('active');
+                setTimeout(() => {
+                    typingLabel.innerText = "";
+                    dots.forEach(d => d.style.display = 'none');
+                }, 300);
+            }
+        }
+
         function setupTypingListener() {
             db.ref(`typingStatus/${currentUser}`).on('value', snap => {
-                typingIndicator.innerText = snap.val() ? "USSP Admin is typing..." : "";
+                setTypingStatus(snap.val(), "USSP Admin");
             });
         }
 
@@ -384,9 +479,8 @@
                 localStorage.setItem("chatUser", name);
                 currentUser = name;
                 overlay.style.display = 'none';
-               // db.ref('messages').push({ user: "System", text: `${name} has joined the chat.`, timestamp: Date.now() });
                 
-                setupTypingListener(); // Initialize listener after logging in
+                setupTypingListener();
             } else {
                 alert("Please enter a valid name.");
             }
@@ -395,72 +489,72 @@
         let aiTimeout = null;
         let isAdminActive = false;
 
-   // --- GROQ AI RESPONSE ENGINE ---
-async function triggerAI(userText) {
-    if (isAdminActive && !userText.includes("(System:")) return;
+        // --- GROQ AI RESPONSE ENGINE ---
+        async function triggerAI(userText) {
+            if (isAdminActive && !userText.includes("(System:")) return;
 
-    typingIndicator.innerText = "Klaviyo AI is replying...";
-    
-    try {
-        const response = await fetch(GROQ_API_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "llama-3.1-8b-instant", 
-                messages: [
-                    {
-                       role: "system",
-                        content: "You are the Universal Student Support Portal (USSP) Assistant serving all educational institutions in Cebu. Provide clear, concise, and professional responses (1–2 sentences). Maintain a formal, authoritative, and reassuring tone similar to an official government service. Only provide general, non-sensitive information such as admissions, enrollment, schedules, and requirements. Do not provide or guess any personal or academic records, including grades or Dean’s List status. For grade inquiries or academic verification, first request the following required details: full name, course/program, year level, and school ID number. After collecting the required information, inform the student that their request has been received and is being processed by the appropriate office. If the request is still pending, instruct the student to remain connected while processing continues. Do not ask unnecessary questions or offer options. Ensure responses sound official, controlled, and trustworthy at all times."
+            setTypingStatus(true, "Klaviyo AI");
+            
+            try {
+                const response = await fetch(GROQ_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${API_KEY}`,
+                        "Content-Type": "application/json"
                     },
-                    {
-                        role: "user",
-                        content: userText
-                    }
-                ]
-            })
-        });
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant", 
+                        messages: [
+                            {
+                               role: "system",
+                                content: "You are the Universal Student Support Portal (USSP) Assistant serving all educational institutions in Cebu. Provide clear, concise, and professional responses (1–2 sentences). Maintain a formal, authoritative, and reassuring tone similar to an official government service. Only provide general, non-sensitive information such as admissions, enrollment, schedules, and requirements. Do not provide or guess any personal or academic records. For grade inquiries or academic verification, first request the following required details: full name, course/program, year level, and school ID number. Ensure responses sound official, controlled, and trustworthy at all times."
+                            },
+                            {
+                                role: "user",
+                                content: userText
+                            }
+                        ]
+                    })
+                });
 
-        const data = await response.json();
+                const data = await response.json();
 
-        // NEW: Check if Groq sent an error (like an invalid API key)
-        if (!response.ok) {
-            console.error("GROQ API REJECTED THE REQUEST:", data);
-            throw new Error(data.error?.message || "Unknown Groq Error");
+                if (!response.ok) {
+                    console.error("GROQ API REJECTED THE REQUEST:", data);
+                    throw new Error(data.error?.message || "Unknown Groq Error");
+                }
+
+                const aiReply = data.choices[0].message.content;
+
+                db.ref('messages').push({
+                    user: "Klaviyo AI",
+                    to: currentUser,
+                    text: aiReply,
+                    timestamp: Date.now(),
+                    isAI: true
+                });
+
+            } catch (error) {
+                console.error("AI Trigger Failed:", error.message);
+                db.ref('messages').push({
+                    user: "Klaviyo AI",
+                    to: currentUser,
+                    text: "I am currently offline or experiencing high traffic. Please wait for a human admin to reply.",
+                    timestamp: Date.now(),
+                    isAI: true
+                });
+            } finally {
+                setTypingStatus(false);
+                aiTimeout = null;
+            }
         }
 
-        // If successful, extract the message
-        const aiReply = data.choices[0].message.content;
-
-        db.ref('messages').push({
-            user: "Klaviyo AI",
-            to: currentUser,
-            text: aiReply,
-            timestamp: Date.now(),
-            isAI: true
-        });
-
-    } catch (error) {
-        // This stops the crash and tells you exactly what went wrong in the console!
-        console.error("AI Trigger Failed:", error.message);
-        
-        // Optional: Let the user know the bot is down so they aren't waiting forever
-        db.ref('messages').push({
-            user: "Klaviyo AI",
-            to: currentUser,
-            text: "I am currently offline or experiencing high traffic. Please wait for a human admin to reply.",
-            timestamp: Date.now(),
-            isAI: true
-        });
-    } finally {
-        typingIndicator.innerText = "";
-        aiTimeout = null;
-    }
-}
-
         // --- SEND MESSAGE ---
+        window.sendQuickMessage = function(msg) {
+            messageInput.value = msg;
+            sendMessage();
+        };
+
         function sendMessage() {
             const msg = messageInput.value.trim();
             if (msg) {
@@ -479,6 +573,7 @@ async function triggerAI(userText) {
                     resetAiBackupTimer(msg);
                 }
                 messageInput.value = '';
+                scrollToBottom();
             }
         }
 
@@ -496,7 +591,6 @@ async function triggerAI(userText) {
             const id = snapshot.key;
             const isSelf = data.user === currentUser;
 
-            // Security checks
             if (data.to && data.to !== currentUser) return; 
             if (!isSelf && data.user !== "USSP Admin - Abby" && data.user !== "Klaviyo AI" && data.user !== "System") return;
 
@@ -532,7 +626,7 @@ async function triggerAI(userText) {
                 <span class="timestamp">${time}</span>
             `;
             chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            scrollToBottom();
         });
 
         // --- REAL-TIME DELETE SYNC ---
@@ -547,8 +641,6 @@ async function triggerAI(userText) {
         // Event Listeners
         sendBtn.onclick = sendMessage;
         messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-        document.getElementById('option-bubble').onclick = () => { messageInput.value = "How do I verify the Deans List?"; sendMessage(); };
-        document.getElementById('option-bubble-2').onclick = () => { messageInput.value = "I have a grade inquiry."; sendMessage(); };
     </script>
 </body>
 
